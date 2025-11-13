@@ -10,8 +10,8 @@ authors = [{name = "hahuyhoang411"}]
 dependencies = [
     "pandas",
     "numpy",
-    "openai",  # for LLM
-    "pytest",  # for testing
+    "pytest",
+    "tqdm",
 ]
 
 [tool.setuptools.packages.find]
