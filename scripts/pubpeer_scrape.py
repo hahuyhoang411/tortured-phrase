@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import argparse
-import json
 import sys
 from pathlib import Path
 from typing import Dict, List
@@ -16,6 +15,7 @@ if str(SRC_PATH) not in sys.path:
     sys.path.insert(0, str(SRC_PATH))
 
 from pipelines.processing.pubpeer.client import PubPeerClient, PubPeerClientConfig
+from pipelines.processing.pubpeer.storage import read_json_list, write_json_list
 
 
 def load_phrases(csv_path: Path, column: str, limit: int | None) -> List[str]:
@@ -31,19 +31,13 @@ def load_phrases(csv_path: Path, column: str, limit: int | None) -> List[str]:
 
 
 def write_results(output_path: Path, results: List[Dict[str, object]]) -> None:
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-    output_path.write_text(json.dumps(results, indent=2), encoding="utf-8")
+    write_json_list(output_path, results)
 
 
 def load_existing(output_path: Path) -> tuple[list[Dict[str, object]], set[str]]:
     if not output_path.exists():
         return [], set()
-    raw = output_path.read_text(encoding="utf-8")
-    if not raw.strip():
-        return [], set()
-    data = json.loads(raw)
-    if not isinstance(data, list):
-        raise ValueError("Existing results file must contain a list")
+    data = read_json_list(output_path)
     processed = set()
     cleaned: List[Dict[str, object]] = []
     for item in data:
